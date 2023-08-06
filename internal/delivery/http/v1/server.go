@@ -17,5 +17,10 @@ func NewServer(userService service.Users, todoService service.Todo) *Server {
 	}
 }
 
-func (s *Server) InitRouters(api *gin.RouterGroup) {
+func (s *Server) Init(api *gin.RouterGroup) {
+	v1 := api.Group("/v1")
+	{
+		s.initLoadRoutes(v1)
+	}
+
 }

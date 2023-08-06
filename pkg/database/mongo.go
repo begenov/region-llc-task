@@ -11,11 +11,11 @@ import (
 
 func NewClient(ctx context.Context, cfg config.ConfigMongo) (*mongo.Client, error) {
 	opts := options.Client().ApplyURI(cfg.Uri)
-	// if cfg.User != "" && cfg.Password != "" {
-	// 	opts.SetAuth(options.Credential{
-	// 		Username: cfg.User, Password: cfg.Password,
-	// 	})
-	// }
+	if cfg.User != "" && cfg.Password != "" {
+		opts.SetAuth(options.Credential{
+			Username: cfg.User, Password: cfg.Password,
+		})
+	}
 
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {

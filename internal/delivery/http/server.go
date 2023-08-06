@@ -29,7 +29,7 @@ func (s *Server) Init(port string) error {
 
 	v1 := v1.NewServer(s.userService, s.todoService)
 
-	v1.InitRouters(api)
+	v1.Init(api)
 
 	return s.engine.Run(port)
 }
