@@ -19,7 +19,9 @@ func (s *Server) initLoadRoutes(api *gin.RouterGroup) {
 			todo := authenticated.Group("/todo-list")
 			{
 				todo.POST("/todo", s.createTodo)
-				todo.PUT("/todo", s.updateTodo)
+				todo.PUT("/todo/:id", s.updateTodo)
+				todo.DELETE("/todo/:id", s.deleteTodo)
+				todo.DELETE("/todo/:id/done", s.doneTodo)
 
 			}
 		}

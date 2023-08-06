@@ -14,4 +14,6 @@ type Users interface {
 
 type Todo interface {
 	CreateTodo(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+	UpdateTodo(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+	DeleteTodoByID(ctx context.Context, id string) error
 }

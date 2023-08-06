@@ -18,5 +18,7 @@ type Users interface {
 type Todo interface {
 	Create(ctx context.Context, todo domain.Todo) (domain.Todo, error)
 	GetTodoByID(ctx context.Context, id primitive.ObjectID) (domain.Todo, error)
-	UpdateTodo(ctx context.Context, todo domain.Todo) (domain.Todo, error)
+	UpdateTodo(ctx context.Context, todo domain.Todo) error
+	GetCountByTitle(ctx context.Context, title string, id primitive.ObjectID) (int64, error)
+	DeleteTodoByID(ctx context.Context, id primitive.ObjectID) error
 }
