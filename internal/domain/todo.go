@@ -14,3 +14,8 @@ type Todo struct {
 	Actor    string             `json:"actor"`
 	Status   string             `json:"status"`
 }
+
+type TodoRequest struct {
+	Title    string    `json:"title" binding:"required"`
+	ActiveAt time.Time `json:"active_at" binding:"required"`
+}

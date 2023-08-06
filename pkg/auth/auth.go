@@ -9,65 +9,63 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+// TokenManager provides logic for JWT & Refresh tokens generation and parsing.
 type TokenManager interface {
-	NewJWT(id string, ttl time.Duration) (string, error)
+	NewJWT(userId string, ttl time.Duration) (string, error)
 	Parse(accessToken string) (string, error)
 	NewRefreshToken() (string, error)
 }
 
 type Manager struct {
-	signInKey string
+	signingKey string
 }
 
-func NewManager(signInKey string) (*Manager, error) {
-	if signInKey == "" {
+func NewManager(signingKey string) (*Manager, error) {
+	if signingKey == "" {
 		return nil, errors.New("empty signing key")
 	}
-	return &Manager{
-		signInKey: signInKey,
-	}, nil
+
+	return &Manager{signingKey: signingKey}, nil
 }
 
-func (m *Manager) NewJWT(id string, ttl time.Duration) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+func (m *Manager) NewJWT(userId string, ttl time.Duration) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(ttl).Unix(),
+		Subject:   userId,
+	})
 
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(ttl).Unix(),
-			Subject:   id,
-		},
-	)
-	tokenRes, err := token.SignedString([]byte(m.signInKey))
-
-	if err != nil {
-		return "", err
-	}
-	return tokenRes, nil
+	return token.SignedString([]byte(m.signingKey))
 }
 
 func (m *Manager) Parse(accessToken string) (string, error) {
-	token, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (i interface{}, err error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(m.signInKey), nil
+
+		return []byte(m.signingKey), nil
 	})
 	if err != nil {
 		return "", err
 	}
+
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return "", fmt.Errorf("error get user claims from token")
 	}
+
 	return claims["sub"].(string), nil
 }
 
 func (m *Manager) NewRefreshToken() (string, error) {
 	b := make([]byte, 32)
+
 	s := rand.NewSource(time.Now().Unix())
 	r := rand.New(s)
 
 	if _, err := r.Read(b); err != nil {
 		return "", err
 	}
+
 	return fmt.Sprintf("%x", b), nil
 }

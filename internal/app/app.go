@@ -37,9 +37,9 @@ func Run(cfg *config.Config) error {
 	todoRepo := mongorepo.NewTodoRepo(db)
 
 	userService := service.NewUserService(userRepo, hash, manager, cfg.Session.AccessTokenTTL, cfg.Session.RefreshTokenTTL)
-	todoService := service.NewTodoService(todoRepo)
+	todoService := service.NewTodoService(todoRepo, userRepo)
 
-	server := http.NewServer(userService, todoService)
+	server := http.NewServer(userService, todoService, manager)
 
 	if err := server.Init(cfg.APIEndpoint); err != nil {
 		return fmt.Errorf("server.Init(): %v", err)
