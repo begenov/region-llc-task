@@ -21,4 +21,7 @@ type Todo interface {
 	UpdateTodo(ctx context.Context, todo domain.Todo) error
 	GetCountByTitle(ctx context.Context, title string, id primitive.ObjectID) (int64, error)
 	DeleteTodoByID(ctx context.Context, id primitive.ObjectID) error
+	UpdateTodoDoneByID(ctx context.Context, id primitive.ObjectID) (domain.Todo, error)
+	GetTodoByStatus(ctx context.Context, status string) ([]domain.Todo, error)
+	UpdateTodoID(ctx context.Context, todo domain.Todo) error
 }
