@@ -1,32 +1,29 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/begenov/region-llc-task/internal/domain"
-	"github.com/begenov/region-llc-task/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) createTodo(ctx *gin.Context) {
 	var inp domain.TodoRequest
 	if err := ctx.BindJSON(&inp); err != nil {
-		logger.Errorf("ctx.BindJSON(): %v", err)
-		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error())
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
 		return
 	}
 
 	if err := validateTodo(inp.Title, inp.ActiveAt); err != nil {
-		logger.Errorf("validateTodo(): %v", err)
-		newResponse(ctx, http.StatusBadRequest, err.Error())
+		newResponse(ctx, http.StatusBadRequest, err.Error(), fmt.Sprintf("validateTodo(): %v", err))
 		return
 	}
 
 	id, err := getUserID(ctx, userCtx)
 	if err != nil {
-		logger.Errorf("getUserID(): %v", err)
-		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("getUserID(): %v", err))
 		return
 	}
 
@@ -39,39 +36,34 @@ func (s *Server) createTodo(ctx *gin.Context) {
 
 	todo, err = s.todoService.CreateTodo(ctx, todo)
 	if err != nil {
-		logger.Errorf("s.todoService.CreateTodo(): %v", err)
-		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.todoService.CreateTodo(): %v", err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, todo)
+	ctx.JSON(http.StatusNoContent, todo)
 }
 
 func (s *Server) updateTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
 	if err := ctx.BindUri(&uri); err != nil {
-		logger.Errorf("ctx.BindUri(): %v", err)
-		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error())
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindUri(): %v", err))
 		return
 	}
 
 	var inp domain.TodoRequest
 	if err := ctx.BindJSON(&inp); err != nil {
-		logger.Errorf("ctx.BindJSON(): %v")
-		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error())
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
 		return
 	}
 
 	if err := validateTodo(inp.Title, inp.ActiveAt); err != nil {
-		logger.Errorf("validateTodo(): %v", err)
-		newResponse(ctx, http.StatusBadRequest, err.Error())
+		newResponse(ctx, http.StatusBadRequest, err.Error(), fmt.Sprintf("validateTodo(): %v", err))
 		return
 	}
 
 	id, err := getUserID(ctx, userCtx)
 	if err != nil {
-		logger.Errorf("getUserID(): %v", err)
-		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("getUserID(): %v", err))
 		return
 	}
 
@@ -85,48 +77,43 @@ func (s *Server) updateTodo(ctx *gin.Context) {
 
 	todo, err = s.todoService.UpdateTodo(ctx, todo)
 	if err != nil {
-		logger.Errorf("s.todoService.UpdateTodo(): %v", err)
-		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.todoService.UpdateTodo(): %v", err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, todo)
+	ctx.JSON(http.StatusNoContent, todo)
 }
 
 func (s *Server) deleteTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
 	if err := ctx.BindUri(&uri); err != nil {
-		logger.Errorf("ctx.BindUri(): %v", err)
-		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error())
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindUri(): %v", err))
 		return
 	}
 
 	err := s.todoService.DeleteTodoByID(ctx, uri.ID)
 	if err != nil {
-		logger.Errorf("primitive.ObjectIDFromHex(): %v", err)
-		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.todoService.DeleteTodoByID(): %v", err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "Deleted todo")
+	ctx.JSON(http.StatusNoContent, Response{"Success Deleting Todo"})
 }
 
 func (s *Server) doneTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
 	if err := ctx.BindUri(&uri); err != nil {
-		logger.Errorf("ctx.BindUri(): %v", err)
-		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error())
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindUri(): %v", err))
 		return
 	}
 
 	todo, err := s.todoService.UpdateTodoDoneByID(ctx, uri.ID)
 	if err != nil {
-		logger.Errorf("primitive.ObjectIDFromHex(): %v", err)
-		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.todoService.UpdateTodoDoneByID(): %v", err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, todo)
+	ctx.JSON(http.StatusNoContent, todo)
 }
 
 func (s *Server) getTodos(ctx *gin.Context) {
@@ -134,18 +121,17 @@ func (s *Server) getTodos(ctx *gin.Context) {
 
 	id, err := getUserID(ctx, userCtx)
 	if err != nil {
-		logger.Errorf("getUserID(): %v", err)
-		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, http.StatusBadRequest, err.Error(), fmt.Sprintf("getUserID(): %v", err))
 		return
 	}
 
 	tasks, err := s.todoService.GetTodosByStatus(ctx, status, id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.todoService.GetTodosByStatus(): %v", err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, tasks)
+	ctx.JSON(http.StatusNoContent, tasks)
 
 }
 

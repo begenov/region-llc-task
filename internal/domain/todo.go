@@ -20,5 +20,5 @@ type TodoRequest struct {
 }
 
 type TodoURI struct {
-	ID string `uri:"id"`
+	ID string `uri:"id" binding:"required"`
 }

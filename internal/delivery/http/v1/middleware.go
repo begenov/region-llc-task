@@ -2,9 +2,11 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/begenov/region-llc-task/internal/domain"
 	"github.com/begenov/region-llc-task/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,7 +20,8 @@ const (
 func (s *Server) userIdentity(c *gin.Context) {
 	id, err := s.parseAuthHeader(c)
 	if err != nil {
-		newResponse(c, http.StatusUnauthorized, err.Error())
+		newResponse(c, http.StatusUnauthorized, err.Error(), fmt.Sprintf("s.parseAuthHeader(): %v", err))
+		return
 	}
 
 	c.Set(userCtx, id)
@@ -55,7 +58,7 @@ func getUserID(c *gin.Context, context string) (primitive.ObjectID, error) {
 
 	id, err := primitive.ObjectIDFromHex(idStr)
 	if err != nil {
-		return primitive.ObjectID{}, err
+		return primitive.ObjectID{}, domain.ErrInternalServer
 	}
 	logger.Info(id)
 	return id, nil

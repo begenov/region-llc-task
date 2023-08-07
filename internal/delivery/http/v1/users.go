@@ -1,10 +1,10 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/begenov/region-llc-task/internal/domain"
-	"github.com/begenov/region-llc-task/pkg/logger"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,15 +32,13 @@ func (s *Server) userSignUp(ctx *gin.Context) {
 	var req domain.UserRequest
 
 	if err := ctx.BindJSON(&req); err != nil {
-		logger.Errorf("ctx.BindJSON(): %v", err)
-		ctx.JSON(http.StatusBadRequest, Response{Message: err.Error()})
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
 		return
 	}
 
 	user, err := s.userService.SignUp(ctx, req)
 	if err != nil {
-		logger.Errorf("ctx.BindJSON(): %v", err)
-		ctx.JSON(http.StatusInternalServerError, Response{Message: err.Error()})
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
 		return
 	}
 
@@ -50,31 +48,31 @@ func (s *Server) userSignUp(ctx *gin.Context) {
 func (s *Server) userSignIn(ctx *gin.Context) {
 	var inp domain.UserSignInRequest
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, Response{Message: domain.ErrInvalidRequest.Error()})
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
 		return
 	}
 
 	tokens, err := s.userService.SignIn(ctx, inp.Email, inp.Password)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, domain.ErrInternalServer.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.userService.SignIn(): %v", err))
 		return
 	}
 
 	ctx.JSON(http.StatusOK, tokens)
 }
 
-func (s *Server) userRefresh(c *gin.Context) {
+func (s *Server) userRefresh(ctx *gin.Context) {
 	var inp domain.RefreshToken
-	if err := c.BindJSON(&inp); err != nil {
-		newResponse(c, http.StatusBadRequest, "invalid input body")
+	if err := ctx.BindJSON(&inp); err != nil {
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
 		return
 	}
 
-	res, err := s.userService.RefreshTokens(c.Request.Context(), inp.RefreshToken)
+	res, err := s.userService.RefreshTokens(ctx, inp.RefreshToken)
 	if err != nil {
-		newResponse(c, http.StatusInternalServerError, err.Error())
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.userService.RefreshTokens(): %v", err))
 		return
 	}
 
-	c.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusOK, res)
 }
