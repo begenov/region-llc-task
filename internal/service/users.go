@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/begenov/region-llc-task/internal/domain"
@@ -42,7 +41,8 @@ func (s *UserService) SignUp(ctx context.Context, inp domain.UserRequest) (domai
 
 	passwordHash, err := s.hash.GenerateFromPassword(inp.Password)
 	if err != nil {
-		return domain.User{}, fmt.Errorf("s.hash.GenerateFromPassword(): %v", err)
+		logger.Errorf("s.hash.GenerateFromPassword(): %v", err)
+		return domain.User{}, domain.ErrInternalServer
 	}
 
 	user := domain.User{
@@ -54,7 +54,7 @@ func (s *UserService) SignUp(ctx context.Context, inp domain.UserRequest) (domai
 	user, err = s.userRepo.Create(ctx, user)
 	if err != nil {
 		logger.Errorf("s.userRepo.Create(): %v", err)
-		return user, fmt.Errorf("s.userRepo.Create(): %v", err)
+		return user, err
 	}
 
 	return user, nil

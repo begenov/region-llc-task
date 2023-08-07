@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/begenov/region-llc-task/internal/domain"
 	"github.com/begenov/region-llc-task/pkg/logger"
@@ -23,13 +22,13 @@ func (r *TodoRepo) Create(ctx context.Context, todo domain.Todo) (domain.Todo, e
 	result, err := r.collection.InsertOne(ctx, todo)
 	if err != nil {
 		logger.Errorf("r.collection.InsertOne(): %v", err)
-		return domain.Todo{}, fmt.Errorf("r.collection.InsertOne(): %v", err)
+		return domain.Todo{}, domain.ErrInternalServer
 	}
 
 	id, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
 		logger.Errorf("result.InsertedID.(primitive.ObjectID): %v", ok)
-		return domain.Todo{}, fmt.Errorf("result.InsertedID.(primitive.ObjectID): %v", ok)
+		return domain.Todo{}, domain.ErrInternalServer
 	}
 
 	todo.ID = id
@@ -40,7 +39,7 @@ func (r *TodoRepo) Create(ctx context.Context, todo domain.Todo) (domain.Todo, e
 func (r *TodoRepo) GetCountByTitle(ctx context.Context, title string, id primitive.ObjectID) (int64, error) {
 	c, err := r.collection.CountDocuments(ctx, bson.M{"title": title, "user_id": id})
 	if err != nil {
-		return 0, err
+		return 0, domain.ErrInternalServer
 	}
 
 	return c, nil
