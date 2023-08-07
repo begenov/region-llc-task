@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/begenov/region-llc-task/internal/domain"
 	"github.com/begenov/region-llc-task/pkg/logger"
@@ -38,16 +39,21 @@ func (r *TodoRepo) Create(ctx context.Context, todo domain.Todo) (domain.Todo, e
 
 func (r *TodoRepo) GetCountByTitle(ctx context.Context, title string, id primitive.ObjectID) (int64, error) {
 	c, err := r.collection.CountDocuments(ctx, bson.M{"title": title, "user_id": id})
-	if err != nil {
-		return 0, domain.ErrInternalServer
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return 0, domain.ErrNotFound
 	}
 
-	return c, nil
+	return c, err
 }
 
 func (r *TodoRepo) GetTodoByID(ctx context.Context, id primitive.ObjectID) (domain.Todo, error) {
 	var todo domain.Todo
 	if err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&todo); err != nil {
+		logger.Errorf("r.collection.FindOne(): %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domain.Todo{}, domain.ErrNotFound
+		}
+
 		return domain.Todo{}, err
 	}
 
@@ -56,12 +62,21 @@ func (r *TodoRepo) GetTodoByID(ctx context.Context, id primitive.ObjectID) (doma
 
 func (r *TodoRepo) UpdateTodoID(ctx context.Context, todo domain.Todo) error {
 	_, err := r.collection.UpdateByID(ctx, todo.ID, bson.M{"$set": bson.M{"id": todo.TodoID}})
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return domain.ErrNotFound
+	}
+
 	return err
 }
 
 func (r *TodoRepo) UpdateTodo(ctx context.Context, todo domain.Todo) error {
 	_, err := r.collection.UpdateByID(ctx, todo.ID, bson.M{"$set": bson.M{"title": todo.Title, "activeAt": todo.ActiveAt}})
 	if err != nil {
+		logger.Errorf("r.collection.UpdateByID(): %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domain.ErrNotFound
+		}
+
 		return err
 	}
 
@@ -71,6 +86,11 @@ func (r *TodoRepo) UpdateTodo(ctx context.Context, todo domain.Todo) error {
 func (r *TodoRepo) DeleteTodoByID(ctx context.Context, id primitive.ObjectID) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
+		logger.Errorf("r.collection.DeleteOne(): %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domain.ErrNotFound
+		}
+
 		return err
 	}
 
@@ -84,6 +104,11 @@ func (r *TodoRepo) UpdateTodoDoneByID(ctx context.Context, id primitive.ObjectID
 	var updatedTodo domain.Todo
 	err := r.collection.FindOneAndUpdate(ctx, filter, update).Decode(&updatedTodo)
 	if err != nil {
+		logger.Errorf("r.collection.FindOneAndUpdate(): %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return domain.Todo{}, domain.ErrNotFound
+		}
+
 		return domain.Todo{}, err
 	}
 
@@ -95,6 +120,10 @@ func (r *TodoRepo) GetTodoByStatus(ctx context.Context, status string, userID pr
 	cur, err := r.collection.Find(ctx, bson.M{"status": status, "user_id": userID})
 	if err != nil {
 		logger.Errorf("r.collection.Find(): %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, domain.ErrNotFound
+		}
+
 		return nil, err
 	}
 	defer cur.Close(ctx)

@@ -3,7 +3,6 @@ package mongo
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/begenov/region-llc-task/internal/domain"
@@ -29,13 +28,13 @@ func (r *UserRepo) Create(ctx context.Context, user domain.User) (domain.User, e
 	result, err := r.collection.InsertOne(ctx, user)
 	if err != nil {
 		logger.Errorf("r.collection.InsertOne(): %v", err)
-		return domain.User{}, fmt.Errorf("r.collection.InsertOne(): %v", err)
+		return domain.User{}, domain.ErrInternalServer
 	}
 
 	id, ok := result.InsertedID.(primitive.ObjectID)
 	if !ok {
 		logger.Errorf("result.InsertedID.(primitive.ObjectID): %v", ok)
-		return domain.User{}, fmt.Errorf("result.InsertedID.(primitive.ObjectID): %v", ok)
+		return domain.User{}, domain.ErrInternalServer
 	}
 
 	user.ID = id
@@ -48,13 +47,12 @@ func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (domain.Use
 
 	err := r.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			logger.Errorf("r.collection.FindOne(email): %v", err)
+		logger.Errorf("r.collection.FindOne(email): %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return domain.User{}, domain.ErrNotFound
 		}
 
-		logger.Errorf("r.collection.FindOne(email): %v", err)
-		return domain.User{}, fmt.Errorf("r.collection.FindOne(email): %v", err)
+		return domain.User{}, domain.ErrInternalServer
 	}
 
 	return user, nil
@@ -65,13 +63,13 @@ func (r *UserRepo) GetUserByID(ctx context.Context, id primitive.ObjectID) (doma
 
 	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			logger.Errorf("r.collection.FindOne(email): %v", err)
+		logger.Errorf("r.collection.FindOne(email): %v", err)
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return domain.User{}, domain.ErrNotFound
 		}
 
 		logger.Errorf("r.collection.FindOne(email): %v", err)
-		return domain.User{}, fmt.Errorf("r.collection.FindOne(email): %v", err)
+		return domain.User{}, domain.ErrInternalServer
 	}
 
 	return user, nil
@@ -83,11 +81,12 @@ func (r *UserRepo) GetByRefreshToken(ctx context.Context, refreshToken string) (
 		"session.refresh_token": refreshToken,
 		"session.expiration_at": bson.M{"$gt": time.Now()},
 	}).Decode(&user); err != nil {
+		logger.Errorf("r.collection.FindOne(email): %v", err)
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return domain.User{}, domain.ErrNotFound
 		}
 
-		return domain.User{}, err
+		return domain.User{}, domain.ErrInternalServer
 	}
 
 	return user, nil
@@ -95,6 +94,9 @@ func (r *UserRepo) GetByRefreshToken(ctx context.Context, refreshToken string) (
 
 func (r *UserRepo) SetSession(ctx context.Context, userID primitive.ObjectID, session domain.Session) error {
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": userID}, bson.M{"$set": bson.M{"session": session, "lastVisitAt": time.Now()}})
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return domain.ErrNotFound
+	}
 
 	return err
 }
