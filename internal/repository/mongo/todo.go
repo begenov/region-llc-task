@@ -91,9 +91,9 @@ func (r *TodoRepo) UpdateTodoDoneByID(ctx context.Context, id primitive.ObjectID
 	return updatedTodo, nil
 }
 
-func (r *TodoRepo) GetTodoByStatus(ctx context.Context, status string) ([]domain.Todo, error) {
+func (r *TodoRepo) GetTodoByStatus(ctx context.Context, status string, userID primitive.ObjectID) ([]domain.Todo, error) {
 	var todos []domain.Todo
-	cur, err := r.collection.Find(ctx, bson.M{"status": status})
+	cur, err := r.collection.Find(ctx, bson.M{"status": status, "user_id": userID})
 	if err != nil {
 		logger.Errorf("r.collection.Find(): %v", err)
 		return nil, err

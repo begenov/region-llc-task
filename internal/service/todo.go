@@ -111,12 +111,12 @@ func (s *TodoService) UpdateTodoDoneByID(ctx context.Context, id string) (domain
 	return todo, nil
 }
 
-func (s *TodoService) GetTodosByStatus(ctx context.Context, status string) ([]domain.Todo, error) {
+func (s *TodoService) GetTodosByStatus(ctx context.Context, status string, userID primitive.ObjectID) ([]domain.Todo, error) {
 	if status == "" {
 		status = "active"
 	}
 
-	todos, err := s.todoRepo.GetTodoByStatus(ctx, status)
+	todos, err := s.todoRepo.GetTodoByStatus(ctx, status, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -148,6 +148,20 @@ func (s *TodoService) GetTodosByStatus(ctx context.Context, status string) ([]do
 	return result, nil
 }
 
+func (s *TodoService) validateTitle(ctx context.Context, user_id primitive.ObjectID, title, activeAt string) error {
+
+	count, err := s.todoRepo.GetCountByTitle(ctx, title, user_id)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return domain.ErrTitleAlreadyExists
+	}
+
+	return nil
+}
+
 func sortByCreatedAt(todos []domain.Todo) {
 	sort.Slice(todos, func(i, j int) bool {
 		timeI, err := parseTimeString(todos[i].ActiveAt)
@@ -174,18 +188,4 @@ func parseTimeString(activeAt string) (time.Time, error) {
 	}
 
 	return t, nil
-}
-
-func (s *TodoService) validateTitle(ctx context.Context, user_id primitive.ObjectID, title, activeAt string) error {
-
-	count, err := s.todoRepo.GetCountByTitle(ctx, title, user_id)
-	if err != nil {
-		return err
-	}
-
-	if count > 0 {
-		return domain.ErrTitleAlreadyExists
-	}
-
-	return nil
 }

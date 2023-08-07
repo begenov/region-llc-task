@@ -132,8 +132,14 @@ func (s *Server) doneTodo(ctx *gin.Context) {
 func (s *Server) getTodos(ctx *gin.Context) {
 	status := ctx.DefaultQuery("status", "active")
 
-	// Call your service method to get tasks based on the status
-	tasks, err := s.todoService.GetTodosByStatus(ctx, status)
+	id, err := getUserID(ctx, userCtx)
+	if err != nil {
+		logger.Errorf("getUserID(): %v", err)
+		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	tasks, err := s.todoService.GetTodosByStatus(ctx, status, id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
