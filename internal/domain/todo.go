@@ -6,7 +6,7 @@ import (
 
 type Todo struct {
 	ID       primitive.ObjectID `json:"-" bson:"_id,omitempty"`
-	TodoID   string             `json:"id" bson:"-"`
+	TodoID   string             `json:"id" bson:"id"`
 	UserID   primitive.ObjectID `json:"user_id" bson:"user_id"`
 	Title    string             `json:"title" bson:"title"`
 	ActiveAt string             `json:"activeAt" bson:"activeAt"`

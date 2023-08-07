@@ -16,4 +16,6 @@ type Todo interface {
 	CreateTodo(ctx context.Context, todo domain.Todo) (domain.Todo, error)
 	UpdateTodo(ctx context.Context, todo domain.Todo) (domain.Todo, error)
 	DeleteTodoByID(ctx context.Context, id string) error
+	UpdateTodoDoneByID(ctx context.Context, id string) (domain.Todo, error)
+	GetTodosByStatus(ctx context.Context, status string) ([]domain.Todo, error)
 }

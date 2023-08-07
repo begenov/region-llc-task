@@ -21,8 +21,8 @@ func (s *Server) initLoadRoutes(api *gin.RouterGroup) {
 				todo.POST("/todo", s.createTodo)
 				todo.PUT("/todo/:id", s.updateTodo)
 				todo.DELETE("/todo/:id", s.deleteTodo)
-				todo.DELETE("/todo/:id/done", s.doneTodo)
-
+				todo.PUT("/todo/:id/done", s.doneTodo)
+				todo.GET("/todo", s.getTodos)
 			}
 		}
 	}
