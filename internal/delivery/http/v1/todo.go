@@ -118,6 +118,29 @@ func (s *Server) doneTodo(ctx *gin.Context) {
 		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error())
 		return
 	}
+
+	todo, err := s.todoService.UpdateTodoDoneByID(ctx, uri.ID)
+	if err != nil {
+		logger.Errorf("primitive.ObjectIDFromHex(): %v", err)
+		newResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, todo)
+}
+
+func (s *Server) getTodos(ctx *gin.Context) {
+	status := ctx.DefaultQuery("status", "active")
+
+	// Call your service method to get tasks based on the status
+	tasks, err := s.todoService.GetTodosByStatus(ctx, status)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, tasks)
+
 }
 
 func validateTodo(title string, activeAt string) error {
