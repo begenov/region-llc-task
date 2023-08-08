@@ -1,12 +1,11 @@
 package redis
 
 import (
-	"context"
 	"time"
 
 	"github.com/begenov/region-llc-task/internal/domain"
 	"github.com/begenov/region-llc-task/pkg/logger"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis"
 )
 
 type Redis struct {
@@ -20,9 +19,8 @@ func NewRedis(rdb *redis.Client) *Redis {
 }
 
 func (r *Redis) Set(key string, value string, expiration time.Duration) error {
-	ctx := context.Background()
 
-	err := r.client.Set(ctx, key, value, expiration).Err()
+	err := r.client.Set(key, value, expiration).Err()
 	if err != nil {
 		logger.Errorf("r.client.Set(): %v\t%s", err, key)
 		return err
@@ -32,8 +30,8 @@ func (r *Redis) Set(key string, value string, expiration time.Duration) error {
 }
 
 func (r *Redis) Get(key string) (string, error) {
-	ctx := context.Background()
-	val := r.client.Get(ctx, key).String()
+
+	val := r.client.Get(key).String()
 
 	if val == "" {
 		logger.Errorf("Not Found: %v", key)
@@ -44,9 +42,7 @@ func (r *Redis) Get(key string) (string, error) {
 }
 
 func (r *Redis) Delete(key string) error {
-	ctx := context.Background()
-
-	err := r.client.Del(ctx, key).Err()
+	err := r.client.Del(key).Err()
 	if err != nil {
 		logger.Errorf("r.client.Del(): %v\t%s", err, key)
 		return err
