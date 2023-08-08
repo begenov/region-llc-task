@@ -40,7 +40,7 @@ func (s *Server) createTodo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, todo)
+	ctx.JSON(http.StatusOK, todo)
 }
 
 func (s *Server) updateTodo(ctx *gin.Context) {
@@ -81,7 +81,7 @@ func (s *Server) updateTodo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, todo)
+	ctx.JSON(http.StatusOK, todo)
 }
 
 func (s *Server) deleteTodo(ctx *gin.Context) {
@@ -97,7 +97,7 @@ func (s *Server) deleteTodo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, Response{"Success Deleting Todo"})
+	ctx.JSON(http.StatusOK, Response{"Success Deleting Todo"})
 }
 
 func (s *Server) doneTodo(ctx *gin.Context) {
@@ -107,13 +107,19 @@ func (s *Server) doneTodo(ctx *gin.Context) {
 		return
 	}
 
-	todo, err := s.todoService.UpdateTodoDoneByID(ctx, uri.ID)
+	id, err := getUserID(ctx, userCtx)
+	if err != nil {
+		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("getUserID(): %v", err))
+		return
+	}
+
+	todo, err := s.todoService.UpdateTodoDoneByID(ctx, uri.ID, id)
 	if err != nil {
 		newResponse(ctx, checkErrors(err), err.Error(), fmt.Sprintf("s.todoService.UpdateTodoDoneByID(): %v", err))
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, todo)
+	ctx.JSON(http.StatusOK, todo)
 }
 
 func (s *Server) getTodos(ctx *gin.Context) {
@@ -131,11 +137,15 @@ func (s *Server) getTodos(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, tasks)
-
+	ctx.JSON(http.StatusOK, tasks)
 }
 
 func validateTodo(title string, activeAt string) error {
+
+	if title == "" {
+		return domain.ErrInvalidTitle
+	}
+
 	if len(title) > 200 {
 		return domain.ErrHeaderLength
 	}

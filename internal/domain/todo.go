@@ -10,13 +10,13 @@ type Todo struct {
 	UserID   primitive.ObjectID `json:"user_id" bson:"user_id"`
 	Title    string             `json:"title" bson:"title"`
 	ActiveAt string             `json:"activeAt" bson:"activeAt"`
-	Actor    string             `json:"actor" bson:"actor"`
+	Author   string             `json:"author" bson:"author"`
 	Status   string             `json:"status" bson:"status"`
 }
 
 type TodoRequest struct {
-	Title    string `json:"title" binding:"required"`
-	ActiveAt string `json:"activeAt" binding:"required"`
+	Title    string `json:"title"`
+	ActiveAt string `json:"activeAt"`
 }
 
 type TodoURI struct {

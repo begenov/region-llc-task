@@ -11,3 +11,13 @@ services:
         - MONGO_INITDB_ROOT_PASSWORD=root
       ports:
         - 27017:27017
+  redis:
+    image: redis
+    container_name: redis-client
+    environment:
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - REDIS_DB=0
+    ports:
+      - 6379:6379

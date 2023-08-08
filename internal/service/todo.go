@@ -35,7 +35,7 @@ func (s *TodoService) CreateTodo(ctx context.Context, todo domain.Todo) (domain.
 		return domain.Todo{}, err
 	}
 
-	todo.Actor = user.UserName
+	todo.Author = user.UserName
 
 	todo, err = s.todoRepo.Create(ctx, todo)
 	if err != nil {
@@ -59,7 +59,8 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todo domain.Todo) (domain.
 
 	todoID, err := primitive.ObjectIDFromHex(todo.TodoID)
 	if err != nil {
-		return domain.Todo{}, err
+		logger.Errorf("primitive.ObjectIDFromHex(): %v", err)
+		return domain.Todo{}, domain.ErrTodoInvalidId
 	}
 
 	todo.ID = todoID
@@ -81,7 +82,7 @@ func (s *TodoService) UpdateTodo(ctx context.Context, todo domain.Todo) (domain.
 func (s *TodoService) DeleteTodoByID(ctx context.Context, id string) error {
 	todoID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		return domain.ErrTodoInvalidId
 	}
 
 	if err := s.todoRepo.DeleteTodoByID(ctx, todoID); err != nil {
@@ -91,12 +92,12 @@ func (s *TodoService) DeleteTodoByID(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *TodoService) UpdateTodoDoneByID(ctx context.Context, id string) (domain.Todo, error) {
+func (s *TodoService) UpdateTodoDoneByID(ctx context.Context, id string, userID primitive.ObjectID) (domain.Todo, error) {
 	todoID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return domain.Todo{}, err
 	}
-	todo, err := s.todoRepo.UpdateTodoDoneByID(ctx, todoID)
+	todo, err := s.todoRepo.UpdateTodoDoneByID(ctx, todoID, userID)
 	if err != nil {
 		return domain.Todo{}, err
 	}
@@ -104,7 +105,7 @@ func (s *TodoService) UpdateTodoDoneByID(ctx context.Context, id string) (domain
 	todo.TodoID = todo.ID.Hex()
 
 	if todo.Status == domain.Active {
-		logger.Info("asfsdglnsdf' nsd'lfn ;asdfn 'asdmf'")
+		logger.Info("TODO")
 		todo.Status = domain.Done
 	}
 

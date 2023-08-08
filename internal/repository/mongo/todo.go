@@ -97,8 +97,8 @@ func (r *TodoRepo) DeleteTodoByID(ctx context.Context, id primitive.ObjectID) er
 	return nil
 }
 
-func (r *TodoRepo) UpdateTodoDoneByID(ctx context.Context, id primitive.ObjectID) (domain.Todo, error) {
-	filter := bson.M{"_id": id}
+func (r *TodoRepo) UpdateTodoDoneByID(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) (domain.Todo, error) {
+	filter := bson.M{"_id": id, "user_id": userID}
 	update := bson.M{"$set": bson.M{"status": domain.Done}}
 
 	var updatedTodo domain.Todo

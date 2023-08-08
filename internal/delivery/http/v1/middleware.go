@@ -35,14 +35,19 @@ func (s *Server) parseAuthHeader(c *gin.Context) (string, error) {
 
 	headerParts := strings.Split(header, " ")
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		return "", errors.New("invalid auth header")
+		return "", domain.ErrInvalidAuthHeader
 	}
 
 	if len(headerParts[1]) == 0 {
 		return "", errors.New("token is empty")
 	}
 
-	return s.tokenManager.Parse(headerParts[1])
+	res, err := s.tokenManager.Parse(headerParts[1])
+	if err != nil {
+		return "", domain.ErrInvalidAuthHeader
+	}
+
+	return res, nil
 }
 
 func getUserID(c *gin.Context, context string) (primitive.ObjectID, error) {

@@ -44,7 +44,6 @@ func (r *UserRepo) Create(ctx context.Context, user domain.User) (domain.User, e
 
 func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
 	var user domain.User
-
 	err := r.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
 	if err != nil {
 		logger.Errorf("r.collection.FindOne(email): %v", err)

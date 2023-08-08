@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/begenov/region-llc-task/internal/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,7 +22,13 @@ type Todo interface {
 	UpdateTodo(ctx context.Context, todo domain.Todo) error
 	GetCountByTitle(ctx context.Context, title string, id primitive.ObjectID) (int64, error)
 	DeleteTodoByID(ctx context.Context, id primitive.ObjectID) error
-	UpdateTodoDoneByID(ctx context.Context, id primitive.ObjectID) (domain.Todo, error)
+	UpdateTodoDoneByID(ctx context.Context, id primitive.ObjectID, userID primitive.ObjectID) (domain.Todo, error)
 	GetTodoByStatus(ctx context.Context, status string, userID primitive.ObjectID) ([]domain.Todo, error)
 	UpdateTodoID(ctx context.Context, todo domain.Todo) error
+}
+
+type Redis interface {
+	Set(key string, value string, expiration time.Duration) error
+	Get(key string) (string, error)
+	Delete(key string) error
 }
