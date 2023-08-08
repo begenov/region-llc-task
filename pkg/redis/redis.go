@@ -1,11 +1,10 @@
 package redis
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/begenov/region-llc-task/internal/config"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis"
 )
 
 func CreateClient(config config.ConfigRedis) (*redis.Client, error) {
@@ -14,7 +13,7 @@ func CreateClient(config config.ConfigRedis) (*redis.Client, error) {
 		Password: config.Password,
 		DB:       config.DB,
 	})
-	_, err := redisClient.Ping(context.Background()).Result()
+	_, err := redisClient.Ping().Result()
 	if err != nil {
 		return nil, fmt.Errorf("redisClient.Ping(): %v", err)
 	}
