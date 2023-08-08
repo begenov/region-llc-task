@@ -96,7 +96,7 @@ func (s *UserService) SignIn(ctx context.Context, email, password string) (domai
 
 func (s *UserService) RefreshTokens(ctx context.Context, refreshToken string) (domain.Token, error) {
 	idString, err := s.redisRepo.Get(refreshToken)
-	if err != nil {
+	if err == nil {
 		idObject, err := primitive.ObjectIDFromHex(idString)
 		if err == nil {
 			return s.createSession(ctx, idObject)
