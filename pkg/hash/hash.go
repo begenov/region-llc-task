@@ -2,6 +2,7 @@ package hash
 
 import "golang.org/x/crypto/bcrypt"
 
+//go:generate mockgen -source=hash.go -destination=mocks/mock.go
 type PasswordHasher interface {
 	GenerateFromPassword(password string) (string, error)
 	CompareHashAndPassword(hashedPassword string, password string) error
