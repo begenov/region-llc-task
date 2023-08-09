@@ -25,7 +25,12 @@ func NewTodoService(todoRepo repository.Todo, userRepo repository.Users) *TodoSe
 
 func (s *TodoService) CreateTodo(ctx context.Context, todo domain.Todo) (domain.Todo, error) {
 
-	if err := s.validateTitle(ctx, todo.UserID, todo.Title, todo.ActiveAt); err != nil {
+	if err := validateTodo(todo.Title, todo.ActiveAt); err != nil {
+		logger.Errorf("validateTodo(): %v", err)
+		return domain.Todo{}, err
+	}
+
+	if err := s.checkTitle(ctx, todo.UserID, todo.Title); err != nil {
 		return domain.Todo{}, err
 	}
 
@@ -43,34 +48,26 @@ func (s *TodoService) CreateTodo(ctx context.Context, todo domain.Todo) (domain.
 		return domain.Todo{}, err
 	}
 
-	todo.TodoID = todo.ID.Hex()
-
-	go func() {
-		err = s.todoRepo.UpdateTodoID(ctx, todo)
-		if err != nil {
-			logger.Errorf("s.todoRepo.UpdateTodo(): %v", err)
-		}
-	}()
-
 	return todo, nil
 }
 
 func (s *TodoService) UpdateTodo(ctx context.Context, todo domain.Todo) (domain.Todo, error) {
 
-	todoID, err := primitive.ObjectIDFromHex(todo.TodoID)
-	if err != nil {
-		logger.Errorf("primitive.ObjectIDFromHex(): %v", err)
-		return domain.Todo{}, domain.ErrTodoInvalidId
+	if err := validateTodo(todo.Title, todo.ActiveAt); err != nil {
+		logger.Errorf("validateTodo(): %v", err)
+		return domain.Todo{}, err
 	}
 
-	todo.ID = todoID
+	if err := s.checkTitle(ctx, todo.UserID, todo.Title); err != nil {
+		return domain.Todo{}, err
+	}
 
 	if err := s.todoRepo.UpdateTodo(ctx, todo); err != nil {
 		logger.Errorf("s.todoRepo.UpdateTodo(): %v", err)
 		return domain.Todo{}, err
 	}
 
-	todo, err = s.todoRepo.GetTodoByID(ctx, todo.ID)
+	todo, err := s.todoRepo.GetTodoByID(ctx, todo.ID)
 	if err != nil {
 		logger.Errorf("s.todoRepo.GetTodoByID(): %v", err)
 		return domain.Todo{}, err
@@ -95,14 +92,13 @@ func (s *TodoService) DeleteTodoByID(ctx context.Context, id string) error {
 func (s *TodoService) UpdateTodoDoneByID(ctx context.Context, id string, userID primitive.ObjectID) (domain.Todo, error) {
 	todoID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return domain.Todo{}, err
+		return domain.Todo{}, domain.ErrTodoInvalidId
 	}
+
 	todo, err := s.todoRepo.UpdateTodoDoneByID(ctx, todoID, userID)
 	if err != nil {
 		return domain.Todo{}, err
 	}
-
-	todo.TodoID = todo.ID.Hex()
 
 	if todo.Status == domain.Active {
 		logger.Info("TODO")
@@ -149,7 +145,7 @@ func (s *TodoService) GetTodosByStatus(ctx context.Context, status string, userI
 	return result, nil
 }
 
-func (s *TodoService) validateTitle(ctx context.Context, user_id primitive.ObjectID, title, activeAt string) error {
+func (s *TodoService) checkTitle(ctx context.Context, user_id primitive.ObjectID, title string) error {
 
 	count, err := s.todoRepo.GetCountByTitle(ctx, title, user_id)
 	if err != nil {
@@ -185,8 +181,26 @@ func parseTimeString(activeAt string) (time.Time, error) {
 
 	t, err := time.Parse(layout, activeAt)
 	if err != nil {
-		return time.Time{}, err
+		return time.Time{}, domain.ErrIncorrectDateFormat
 	}
 
 	return t, nil
+}
+
+func validateTodo(title string, activeAt string) error {
+
+	if title == "" {
+		return domain.ErrInvalidTitle
+	}
+
+	if len(title) > 200 {
+		return domain.ErrHeaderLength
+	}
+
+	_, err := time.Parse("2006-01-02", activeAt)
+	if err != nil {
+		return domain.ErrIncorrectDateFormat
+	}
+
+	return nil
 }
