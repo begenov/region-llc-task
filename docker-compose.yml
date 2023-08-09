@@ -1,23 +1,42 @@
 version: '3.1'
 
-services:
+networks:
+  internal:
+    driver: bridge
 
+services:
   mongodb:
-      image: mongo
-      container_name: mongodb
-      environment:
-        - MONGODB_DATABASE=region
-        - MONGO_INITDB_ROOT_USERNAME=root
-        - MONGO_INITDB_ROOT_PASSWORD=root
-      ports:
-        - 27017:27017
+    image: mongo
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - internal
+    ports:
+      - "27017:27017"
+
   redis:
     image: redis
     container_name: redis-client
     environment:
-      - REDIS_HOST=localhost
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=
-      - REDIS_DB=0
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    networks:
+      - internal
     ports:
-      - 6379:6379
+      - "6379:6379"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+    depends_on:
+      - mongodb
+      - redis
