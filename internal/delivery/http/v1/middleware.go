@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	authorizationHeader = "Authorization"
-	userCtx             = "userId"
+	authorizationHeaderKey = "Authorization"
+	userCtx                = "userId"
 )
 
 func (s *Server) userIdentity(c *gin.Context) {
@@ -28,7 +28,7 @@ func (s *Server) userIdentity(c *gin.Context) {
 }
 
 func (s *Server) parseAuthHeader(c *gin.Context) (string, error) {
-	header := c.GetHeader(authorizationHeader)
+	header := c.GetHeader(authorizationHeaderKey)
 	if header == "" {
 		return "", errors.New("empty auth header")
 	}
