@@ -5,8 +5,7 @@ import (
 )
 
 type Todo struct {
-	ID       primitive.ObjectID `json:"-" bson:"_id,omitempty"`
-	TodoID   string             `json:"id" bson:"id"`
+	ID       primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	UserID   primitive.ObjectID `json:"user_id" bson:"user_id"`
 	Title    string             `json:"title" bson:"title"`
 	ActiveAt string             `json:"activeAt" bson:"activeAt"`
@@ -22,3 +21,7 @@ type TodoRequest struct {
 type TodoURI struct {
 	ID string `uri:"id" binding:"required"`
 }
+
+const (
+	Format = "2006-01-02"
+)

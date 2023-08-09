@@ -32,7 +32,6 @@ func createTodo(t *testing.T) domain.Todo {
 	require.Equal(t, todo.Status, newTodo.Status)
 
 	require.NotEmpty(t, newTodo.ID)
-	newTodo.TodoID = newTodo.ID.Hex()
 
 	err = todoRepo.UpdateTodoID(ctx, newTodo)
 	require.NoError(t, err)
@@ -64,7 +63,6 @@ func createTodos(t *testing.T) primitive.ObjectID {
 		require.Equal(t, todo.Status, newTodo.Status)
 
 		require.NotEmpty(t, newTodo.ID)
-		newTodo.TodoID = newTodo.ID.Hex()
 
 		err = todoRepo.UpdateTodoID(ctx, newTodo)
 		require.NoError(t, err)
@@ -98,7 +96,6 @@ func TestTodoRepo_GetTodoByID(t *testing.T) {
 
 	require.Equal(t, todo.ID, todoI.ID)
 	require.Equal(t, todo.UserID, todoI.UserID)
-	require.Equal(t, todo.TodoID, todoI.TodoID)
 	require.Equal(t, todo.ActiveAt, todoI.ActiveAt)
 	require.Equal(t, todo.Title, todoI.Title)
 	require.Equal(t, todo.ActiveAt, todoI.ActiveAt)

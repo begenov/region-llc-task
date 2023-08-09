@@ -61,7 +61,7 @@ func (r *TodoRepo) GetTodoByID(ctx context.Context, id primitive.ObjectID) (doma
 }
 
 func (r *TodoRepo) UpdateTodoID(ctx context.Context, todo domain.Todo) error {
-	_, err := r.collection.UpdateByID(ctx, todo.ID, bson.M{"$set": bson.M{"id": todo.TodoID}})
+	_, err := r.collection.UpdateByID(ctx, todo.ID, bson.M{"$set": bson.M{"_id": todo.ID}})
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return domain.ErrNotFound
 	}

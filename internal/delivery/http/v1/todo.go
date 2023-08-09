@@ -3,21 +3,16 @@ package v1
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/begenov/region-llc-task/internal/domain"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (s *Server) createTodo(ctx *gin.Context) {
 	var inp domain.TodoRequest
 	if err := ctx.BindJSON(&inp); err != nil {
 		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
-		return
-	}
-
-	if err := validateTodo(inp.Title, inp.ActiveAt); err != nil {
-		newResponse(ctx, http.StatusBadRequest, err.Error(), fmt.Sprintf("validateTodo(): %v", err))
 		return
 	}
 
@@ -50,14 +45,15 @@ func (s *Server) updateTodo(ctx *gin.Context) {
 		return
 	}
 
-	var inp domain.TodoRequest
-	if err := ctx.BindJSON(&inp); err != nil {
-		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
+	todoID, err := primitive.ObjectIDFromHex(uri.ID)
+	if err != nil {
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindUri(): %v", err))
 		return
 	}
 
-	if err := validateTodo(inp.Title, inp.ActiveAt); err != nil {
-		newResponse(ctx, http.StatusBadRequest, err.Error(), fmt.Sprintf("validateTodo(): %v", err))
+	var inp domain.TodoRequest
+	if err := ctx.BindJSON(&inp); err != nil {
+		newResponse(ctx, http.StatusBadRequest, domain.ErrInvalidRequest.Error(), fmt.Sprintf("ctx.BindJSON(): %v", err))
 		return
 	}
 
@@ -68,7 +64,7 @@ func (s *Server) updateTodo(ctx *gin.Context) {
 	}
 
 	todo := domain.Todo{
-		TodoID:   uri.ID,
+		ID:       todoID,
 		UserID:   id,
 		Title:    inp.Title,
 		ActiveAt: inp.ActiveAt,
@@ -138,22 +134,4 @@ func (s *Server) getTodos(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, tasks)
-}
-
-func validateTodo(title string, activeAt string) error {
-
-	if title == "" {
-		return domain.ErrInvalidTitle
-	}
-
-	if len(title) > 200 {
-		return domain.ErrHeaderLength
-	}
-
-	_, err := time.Parse("2006-01-02", activeAt)
-	if err != nil {
-		return domain.ErrIncorrectDateFormat
-	}
-
-	return nil
 }
