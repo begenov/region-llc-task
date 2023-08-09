@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
 type Users interface {
 	SignUp(ctx context.Context, inp domain.UserRequest) (domain.User, error)
 	SignIn(ctx context.Context, email, password string) (domain.Token, error)
