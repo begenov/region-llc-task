@@ -1,0 +1,355 @@
+basePath: /api/v1/
+definitions:
+  domain.RefreshToken:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  domain.Todo:
+    properties:
+      activeAt:
+        type: string
+      author:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      user_id:
+        type: string
+    type: object
+  domain.TodoRequest:
+    properties:
+      activeAt:
+        type: string
+      title:
+        type: string
+    type: object
+  domain.Token:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  domain.UserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  domain.UserSignInRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  v1.Response:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for Todo List
+  title: Todo List API
+  version: "1.0"
+paths:
+  /users/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh Token
+      parameters:
+      - description: User
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RefreshToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Refresh Token
+      tags:
+      - User
+  /users/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign-in
+      parameters:
+      - description: User
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UserSignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Sign-in
+      tags:
+      - User
+  /users/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Create a new User with the input payload
+      parameters:
+      - description: User
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      summary: Create a new User
+      tags:
+      - User
+  /users/todo-list/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: User Delete Todo List
+      parameters:
+      - description: Todo List ID
+        in: path
+        name: domain.TodoURI
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - UserAuth: []
+      summary: User Delete Todo List
+      tags:
+      - Todo List
+    put:
+      consumes:
+      - application/json
+      description: User Update Todo List
+      parameters:
+      - description: Todo List update info
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TodoRequest'
+      - description: Todo List id
+        in: path
+        name: domain.TodoURI
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - UserAuth: []
+      summary: User Update Todo List
+      tags:
+      - Todo List
+  /users/todo-list/{id}/done:
+    put:
+      consumes:
+      - application/json
+      description: User Update Todo List
+      parameters:
+      - description: Todo List id
+        in: path
+        name: domain.TodoURI
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - UserAuth: []
+      summary: User Update Todo List
+      tags:
+      - Todo List
+  /users/todo-list/todo:
+    post:
+      consumes:
+      - application/json
+      description: User Create New Todo List
+      parameters:
+      - description: Todo-List
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - UserAuth: []
+      summary: User Create New Todo List
+      tags:
+      - Courses
+  /users/todo-list/todo{id}:
+    get:
+      consumes:
+      - application/json
+      description: User Get Todo List By Status
+      parameters:
+      - description: 'Task status (default: active)'
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/domain.Todo'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - UserAuth: []
+      summary: User Get Todo List By Status
+      tags:
+      - Todo List
+securityDefinitions:
+  UserAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

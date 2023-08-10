@@ -1,6 +1,7 @@
 package http
 
 import (
+	_ "github.com/begenov/region-llc-task/docs"
 	v1 "github.com/begenov/region-llc-task/internal/delivery/http/v1"
 	"github.com/begenov/region-llc-task/internal/service"
 	"github.com/begenov/region-llc-task/pkg/auth"

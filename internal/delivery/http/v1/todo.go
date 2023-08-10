@@ -11,14 +11,14 @@ import (
 
 // @Summary		User Create New Todo List
 // @Security UserAuth
-// @Tags			Courses
+// @Tags			Todo List
 // @Description	User Create New Todo List
 // @Accept			json
 // @Produce		json
 // @Param			account	body		domain.TodoRequest	true	"Todo-List"
 // @Success		200		{object}	domain.Todo
-// @Failure		400		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Failure		400		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/todo-list/todo [post]
 func (s *Server) createTodo(ctx *gin.Context) {
 	var inp domain.TodoRequest
@@ -58,9 +58,9 @@ func (s *Server) createTodo(ctx *gin.Context) {
 // @Param			account	body		domain.TodoRequest	true	"Todo List update info"
 // @Param			domain.TodoURI path string		true	"Todo List id"
 // @Success		200		{object}	domain.Todo
-// @Failure		400		{object}	Resposne
-// @Failure		404		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Failure		400		{object}	Response
+// @Failure		404		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/todo-list/{id} [put]
 func (s *Server) updateTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
@@ -111,10 +111,10 @@ func (s *Server) updateTodo(ctx *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Param			domain.TodoURI path string		true	"Todo List ID"
-// @Success		200		{object}	Resposne
-// @Failure		400		{object}	Resposne
-// @Failure		404		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Success		200		{object}	Response
+// @Failure		400		{object}	Response
+// @Failure		404		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/todo-list/{id} [delete]
 func (s *Server) deleteTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
@@ -140,9 +140,9 @@ func (s *Server) deleteTodo(ctx *gin.Context) {
 // @Produce		json
 // @Param			domain.TodoURI path string		true	"Todo List id"
 // @Success		200		{object}	domain.Todo
-// @Failure		400		{object}	Resposne
-// @Failure		404		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Failure		400		{object}	Response
+// @Failure		404		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/todo-list/{id}/done [put]
 func (s *Server) doneTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
@@ -174,9 +174,9 @@ func (s *Server) doneTodo(ctx *gin.Context) {
 // @Produce		json
 // @Param	status	query	string	false	"Task status (default: active)"
 // @Success		201		{object}	[]domain.Todo
-// @Failure		400		{object}	Resposne
-// @Failure		404		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Failure		400		{object}	Response
+// @Failure		404		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/todo-list/todo{id} [get]
 func (s *Server) getTodos(ctx *gin.Context) {
 	status := ctx.DefaultQuery("status", "active")

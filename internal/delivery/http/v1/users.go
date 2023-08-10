@@ -34,9 +34,9 @@ func (s *Server) initLoadRoutes(api *gin.RouterGroup) {
 // @Accept			json
 // @Produce		json
 // @Param			account	body		domain.UserRequest	true	"User"
-// @Success		200		{object}	Resposne
-// @Failure		400		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Success		200		{object}	Response
+// @Failure		400		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/sign-up [post]
 func (s *Server) userSignUp(ctx *gin.Context) {
 	var req domain.UserRequest
@@ -61,10 +61,10 @@ func (s *Server) userSignUp(ctx *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Param			account	body		domain.UserSignInRequest	true	"User"
-// @Success		200		{object}	Resposne
-// @Failure		400		{object}	Resposne
-// @Failure		404		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Success		200		{object}	Response
+// @Failure		400		{object}	Response
+// @Failure		404		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/sign-in [post]
 func (s *Server) userSignIn(ctx *gin.Context) {
 	var inp domain.UserSignInRequest
@@ -89,9 +89,9 @@ func (s *Server) userSignIn(ctx *gin.Context) {
 // @Produce		json
 // @Param			account	body		domain.RefreshToken	true	"User"
 // @Success		200		{object}	domain.Token
-// @Failure		400		{object}	Resposne
-// @Failure		404		{object}	Resposne
-// @Failure		500		{object}	Resposne
+// @Failure		400		{object}	Response
+// @Failure		404		{object}	Response
+// @Failure		500		{object}	Response
 // @Router			/users/auth/refresh [post]
 func (s *Server) userRefresh(ctx *gin.Context) {
 	var inp domain.RefreshToken
