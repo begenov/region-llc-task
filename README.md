@@ -138,5 +138,5 @@ docker-compose down
 ##  Тестирование
 Запуск unit тестов
 ```shell
-go test -cover ./...
+make test
 ```
