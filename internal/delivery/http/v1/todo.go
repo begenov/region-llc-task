@@ -173,7 +173,7 @@ func (s *Server) doneTodo(ctx *gin.Context) {
 // @Accept			json
 // @Produce		json
 // @Param	status	query	string	false	"Task status (default: active)"
-// @Success		201		{object}	[]domain.Todo
+// @Success		200		{object}	[]domain.Todo
 // @Failure		400		{object}	Response
 // @Failure		404		{object}	Response
 // @Failure		500		{object}	Response
