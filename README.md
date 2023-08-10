@@ -74,7 +74,7 @@ docker-compose down
 
 ```json
 {
-   "refresh_token": "your-refresh-token"
+   "refresh_token": "ваш-токен-обновления"
 }
 ```
 
