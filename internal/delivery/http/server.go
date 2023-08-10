@@ -6,6 +6,8 @@ import (
 	"github.com/begenov/region-llc-task/pkg/auth"
 	"github.com/gin-contrib/logger"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -27,6 +29,7 @@ func NewServer(userService service.Users, todoService service.Todo, tokenManager
 func (s *Server) Init(port string) error {
 	s.engine.Use(logger.SetLogger())
 	s.engine.Use(gin.Recovery())
+	s.engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	api := s.engine.Group("/api")
 

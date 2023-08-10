@@ -28,6 +28,16 @@ func (s *Server) initLoadRoutes(api *gin.RouterGroup) {
 	}
 }
 
+// @Summary		Create a new User
+// @Tags			User
+// @Description	Create a new User with the input payload
+// @Accept			json
+// @Produce		json
+// @Param			account	body		domain.UserRequest	true	"User"
+// @Success		200		{object}	Resposne
+// @Failure		400		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/sign-up [post]
 func (s *Server) userSignUp(ctx *gin.Context) {
 	var req domain.UserRequest
 
@@ -45,6 +55,17 @@ func (s *Server) userSignUp(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
+// @Summary		Sign-in
+// @Tags			User
+// @Description	Sign-in
+// @Accept			json
+// @Produce		json
+// @Param			account	body		domain.UserSignInRequest	true	"User"
+// @Success		200		{object}	Resposne
+// @Failure		400		{object}	Resposne
+// @Failure		404		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/sign-in [post]
 func (s *Server) userSignIn(ctx *gin.Context) {
 	var inp domain.UserSignInRequest
 	if err := ctx.BindJSON(&inp); err != nil {
@@ -61,6 +82,17 @@ func (s *Server) userSignIn(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, tokens)
 }
 
+// @Summary		Refresh Token
+// @Tags			User
+// @Description	Refresh Token
+// @Accept			json
+// @Produce		json
+// @Param			account	body		domain.RefreshToken	true	"User"
+// @Success		200		{object}	domain.Token
+// @Failure		400		{object}	Resposne
+// @Failure		404		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/auth/refresh [post]
 func (s *Server) userRefresh(ctx *gin.Context) {
 	var inp domain.RefreshToken
 	if err := ctx.BindJSON(&inp); err != nil {

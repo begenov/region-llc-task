@@ -9,6 +9,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// @Summary		User Create New Todo List
+// @Security UserAuth
+// @Tags			Courses
+// @Description	User Create New Todo List
+// @Accept			json
+// @Produce		json
+// @Param			account	body		domain.TodoRequest	true	"Todo-List"
+// @Success		200		{object}	domain.Todo
+// @Failure		400		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/todo-list/todo [post]
 func (s *Server) createTodo(ctx *gin.Context) {
 	var inp domain.TodoRequest
 	if err := ctx.BindJSON(&inp); err != nil {
@@ -38,6 +49,19 @@ func (s *Server) createTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, todo)
 }
 
+// @Summary		User Update Todo List
+// @Security UserAuth
+// @Tags			Todo List
+// @Description	User Update Todo List
+// @Accept			json
+// @Produce		json
+// @Param			account	body		domain.TodoRequest	true	"Todo List update info"
+// @Param			domain.TodoURI path string		true	"Todo List id"
+// @Success		200		{object}	domain.Todo
+// @Failure		400		{object}	Resposne
+// @Failure		404		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/todo-list/{id} [put]
 func (s *Server) updateTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
 	if err := ctx.BindUri(&uri); err != nil {
@@ -80,6 +104,18 @@ func (s *Server) updateTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, todo)
 }
 
+// @Summary		User Delete Todo List
+// @Security UserAuth
+// @Tags			Todo List
+// @Description	User Delete Todo List
+// @Accept			json
+// @Produce		json
+// @Param			domain.TodoURI path string		true	"Todo List ID"
+// @Success		200		{object}	Resposne
+// @Failure		400		{object}	Resposne
+// @Failure		404		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/todo-list/{id} [delete]
 func (s *Server) deleteTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
 	if err := ctx.BindUri(&uri); err != nil {
@@ -96,6 +132,18 @@ func (s *Server) deleteTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, Response{"Success Deleting Todo"})
 }
 
+// @Summary		User Update Todo List
+// @Security UserAuth
+// @Tags			Todo List
+// @Description	User Update Todo List
+// @Accept			json
+// @Produce		json
+// @Param			domain.TodoURI path string		true	"Todo List id"
+// @Success		200		{object}	domain.Todo
+// @Failure		400		{object}	Resposne
+// @Failure		404		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/todo-list/{id}/done [put]
 func (s *Server) doneTodo(ctx *gin.Context) {
 	var uri domain.TodoURI
 	if err := ctx.BindUri(&uri); err != nil {
@@ -118,6 +166,18 @@ func (s *Server) doneTodo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, todo)
 }
 
+// @Summary		User Get Todo List By Status
+// @Security UserAuth
+// @Tags			Todo List
+// @Description	User Get Todo List By Status
+// @Accept			json
+// @Produce		json
+// @Param	status	query	string	false	"Task status (default: active)"
+// @Success		201		{object}	[]domain.Todo
+// @Failure		400		{object}	Resposne
+// @Failure		404		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/users/todo-list/todo{id} [get]
 func (s *Server) getTodos(ctx *gin.Context) {
 	status := ctx.DefaultQuery("status", "active")
 
