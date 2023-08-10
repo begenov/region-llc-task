@@ -44,7 +44,7 @@ func TestServer_createTodo(t *testing.T) {
 			name: "status ok",
 			inp: domain.TodoRequest{
 				Title:    utils.RandomString(10),
-				ActiveAt: time.Now().Format(domain.Format),
+				ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 			},
 			setupAuth: func(request *http.Request, id string, token auth.TokenManager) {
 				addAuthorization(t, request, token, "Bearer", id, time.Minute)
@@ -65,7 +65,7 @@ func TestServer_createTodo(t *testing.T) {
 					UserID:   primitive.NewObjectID(),
 					Title:    inp.Title,
 					Author:   utils.RandomString(10),
-					ActiveAt: time.Now().Format(domain.Format),
+					ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 					Status:   domain.Active,
 				}, nil)
 			},
@@ -78,7 +78,7 @@ func TestServer_createTodo(t *testing.T) {
 			name: "bad request",
 			inp: domain.TodoRequest{
 				Title:    "",
-				ActiveAt: time.Now().Format(domain.Format),
+				ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 			},
 			userID: primitive.NewObjectID().Hex(),
 			setupAuth: func(request *http.Request, id string, token auth.TokenManager) {
@@ -98,7 +98,7 @@ func TestServer_createTodo(t *testing.T) {
 			name: "auth error",
 			inp: domain.TodoRequest{
 				Title:    "",
-				ActiveAt: time.Now().Format(domain.Format),
+				ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 			},
 			userID: utils.RandomString(10),
 			setupAuth: func(request *http.Request, id string, token auth.TokenManager) {
@@ -166,7 +166,7 @@ func TestServer_updateTodo(t *testing.T) {
 			name: "ok",
 			inp: domain.TodoRequest{
 				Title:    utils.RandomString(10),
-				ActiveAt: time.Now().Format(domain.Format),
+				ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 			},
 			uri: domain.TodoURI{},
 			setupAuth: func(request *http.Request, id string, token auth.TokenManager) {
@@ -194,7 +194,7 @@ func TestServer_updateTodo(t *testing.T) {
 			name: "title empty",
 			inp: domain.TodoRequest{
 				Title:    "",
-				ActiveAt: time.Now().Format(domain.Format),
+				ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 			},
 			uri: domain.TodoURI{},
 			setupAuth: func(request *http.Request, id string, token auth.TokenManager) {
@@ -441,7 +441,7 @@ func TestServer_getTodos(t *testing.T) {
 						ID:       primitive.NewObjectID(),
 						UserID:   userID,
 						Title:    utils.RandomString(10),
-						ActiveAt: time.Now().Format(domain.Format),
+						ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 						Author:   utils.RandomString(10),
 						Status:   status,
 					},
@@ -449,7 +449,7 @@ func TestServer_getTodos(t *testing.T) {
 						ID:       primitive.NewObjectID(),
 						UserID:   userID,
 						Title:    utils.RandomString(10),
-						ActiveAt: time.Now().Format(domain.Format),
+						ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 						Author:   utils.RandomString(10),
 						Status:   status,
 					}}, nil)
@@ -473,7 +473,7 @@ func TestServer_getTodos(t *testing.T) {
 						ID:       primitive.NewObjectID(),
 						UserID:   userID,
 						Title:    utils.RandomString(10),
-						ActiveAt: time.Now().Format(domain.Format),
+						ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 						Author:   utils.RandomString(10),
 						Status:   status,
 					},
@@ -481,7 +481,7 @@ func TestServer_getTodos(t *testing.T) {
 						ID:       primitive.NewObjectID(),
 						UserID:   userID,
 						Title:    utils.RandomString(10),
-						ActiveAt: time.Now().Format(domain.Format),
+						ActiveAt: time.Now().Add(time.Hour * 24).Format(domain.Format),
 						Author:   utils.RandomString(10),
 						Status:   status,
 					}}, nil)
