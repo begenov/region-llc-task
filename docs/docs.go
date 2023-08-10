@@ -181,7 +181,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Courses"
+                    "Todo List"
                 ],
                 "summary": "User Create New Todo List",
                 "parameters": [

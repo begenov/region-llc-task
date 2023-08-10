@@ -310,7 +310,7 @@ paths:
       - UserAuth: []
       summary: User Create New Todo List
       tags:
-      - Courses
+      - Todo List
   /users/todo-list/todo{id}:
     get:
       consumes:
