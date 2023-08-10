@@ -16,4 +16,5 @@ var (
 	ErrInvalidTitle          = errors.New("invalid empty title")
 	ErrInvalidAuthHeader     = errors.New("invalid auth header")
 	ErrTodoInvalidId         = errors.New("invalid todo id")
+	ErrTodoActiveAtData      = errors.New("active date has already passed")
 )

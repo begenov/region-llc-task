@@ -197,9 +197,15 @@ func validateTodo(title string, activeAt string) error {
 		return domain.ErrHeaderLength
 	}
 
-	_, err := time.Parse("2006-01-02", activeAt)
+	t, err := time.Parse("2006-01-02", activeAt)
 	if err != nil {
 		return domain.ErrIncorrectDateFormat
+	}
+
+	currentTime := time.Now()
+
+	if t.Before(currentTime) {
+		return domain.ErrTodoActiveAtData
 	}
 
 	return nil

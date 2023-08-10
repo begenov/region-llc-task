@@ -9,7 +9,7 @@ import (
 func checkErrors(err error) int {
 	switch err {
 	case domain.ErrInvalidRequest, domain.ErrEmailAlreadyExists, domain.ErrIncorrectDateFormat, domain.ErrHeaderLength,
-		domain.ErrTitleAlreadyExists, domain.ErrInvalidTitle, domain.ErrTodoInvalidId:
+		domain.ErrTitleAlreadyExists, domain.ErrInvalidTitle, domain.ErrTodoInvalidId, domain.ErrTodoActiveAtData:
 		return http.StatusBadRequest
 	case domain.ErrNotFound:
 		return http.StatusNotFound
